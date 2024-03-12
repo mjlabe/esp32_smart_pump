@@ -20,7 +20,7 @@ def connect(ssid=env.WIFI_SSID, password=env.WIFI_PASSWD):
     
     led_power = LED(env.LED_POWER)
     led_error = LED(env.LED_ERROR)
-    pump_relay = Relay(env.RELAY_PUMP)
+    relay_pump = Relay(env.RELAY_PUMP)
 
     led_error.on()
     
@@ -40,10 +40,12 @@ def connect(ssid=env.WIFI_SSID, password=env.WIFI_PASSWD):
     led_power.on()
 
     # RELAY OFF
-    pump_relay.off()
+    relay_pump.off()
 
 
 def request_post(message):
+    print(f"POST {message}")
+    conn = None
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         if gc.mem_free() < 102000:
@@ -59,11 +61,19 @@ def request_post(message):
         conn.send("Connection: close\n\n")
         conn.sendall(message)
     except OSError as e:
-        conn.close()
-        print("Connection closed")
+        try:
+            conn.close()
+            print("Connection closed")
+        except Exception as e:
+            pass
+    except Exception as e:
+        pass
     finally:
-        conn.close()
-        print("Connection closed")
+        try:
+            conn.close()
+            print("Connection closed")
+        except Exception as e:
+            pass
 
 
 class LED:
@@ -103,7 +113,16 @@ class Relay:
 
 class Sensor:
     def __init__(self, pin):
-        self.pin = Pin(pin, Pin.IN)
+        self.pin = Pin(pin, mode=Pin.IN, pull=Pin.PULL_UP)
 
-    def status(self):
-        return self.pin()
+    def low(self):
+        is_low = not self.pin.value()
+        sleep(1)
+        is_low = is_low or not self.pin.value()
+        return not is_low
+
+    def high(self):
+        is_high = not self.pin.value()
+        sleep(1)
+        is_high = is_high or self.pin.value()
+        return is_high

@@ -1,39 +1,63 @@
-from time import sleep
+import esp
+import gc
 
-from hardware import LED, Relay, Sensor, request_post
+try:
+    import usocket as socket
+except:
+    import socket
 
-import env
+from hardware import connect
+from api import respond
+from sump_pump.pump_simple import PumpSimple
+
+esp.osdebug(None)
 
 
-def monitor_water():
-    led_pump = LED(env.LED_PUMP)
-    relay_pump = Relay(env.RELAY_PUMP)
+def run():
+    print("Starting Server...")
+    pump = PumpSimple()
 
-    sensor_water_low = Sensor(pin=9)
-    sensor_water_high = Sensor(pin=10)
+    # start server
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.bind(("", 80))
+        sock.listen(5)
+    except Exception as e:
+        print(f"Error with wireless connection: {e}")
 
-    on_time = 0
-    cycle_time = 0
-
+    # main loop
+    print("Monitoring...")
     while True:
-        if sensor_water_high.status() == 1 and cycle_time > 30:
-            relay_pump.on()
-            led_pump.on()
-            on_time += 1
-            request_post('{"pump": "on"}')
+        # try:
+        #     if gc.mem_free() < 102000:
+        #         gc.collect()
+        #     conn, addr = sock.accept()
+        #     conn.settimeout(3.0)
+        #     print("Got a connection from %s" % str(addr))
+        #     request = conn.recv(1024)
+        #     conn.settimeout(None)
+        #
+        #     respond(conn, "")
+        # except OSError as e:
+        #     conn.close()
+        #     print("Connection closed")
+        # except Exception as e:
+        #     print(f"Error: {e}")
+        # finally:
+        #     conn.close()
+        #     print("Connection closed")
 
-        elif sensor_water_low.status() == 0:
-            relay_pump.off()
-            led_pump.off()
-            on_time = 0
-            cycle_time += 1
-            request_post('{"pump": "off"}')
+        print("Checking levels")
+        pump.monitor_water()
 
-        sleep(1)
 
-        # if pump is on for more than defined on time, shut off for defined cooldown time
-        if on_time > env.TIME_ON_MAX:
-            relay_pump.off()
-            led_pump.off()
+def main():
+    try:
+        connect()
+    except Exception as e:
+        print(f"Error connecting to WiFi: {e}")
+    run()
 
-            sleep(env.TIME_COOLDOWN)
+
+if __name__ == "__main__":
+    main()

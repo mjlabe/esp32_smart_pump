@@ -1,9 +1,4 @@
 try:
-    import usocket as socket
-except:
-    import socket
-
-try:
     from machine import Pin
 except ModuleNotFoundError:
     pass
@@ -79,30 +74,3 @@ def respond(conn, message):
     conn.send("Content-Type: text/html\n")
     conn.send("Connection: close\n\n")
     conn.sendall(message)
-
-
-def start_server():
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind(("", 80))
-        sock.listen(5)
-
-        while True:
-            try:
-                if gc.mem_free() < 102000:
-                    gc.collect()
-                conn, addr = sock.accept()
-                conn.settimeout(3.0)
-                print("Got a connection from %s" % str(addr))
-                request = conn.recv(1024)
-                conn.settimeout(None)
-
-                respond(conn, "")
-            except OSError as e:
-                conn.close()
-                print("Connection closed")
-            finally:
-                conn.close()
-                print("Connection closed")
-    finally:
-        sock.close()

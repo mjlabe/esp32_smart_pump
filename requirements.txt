@@ -9,4 +9,5 @@ pycparser==2.21
 pyserial==3.5
 PyYAML==6.0.1
 reedsolo==1.7.0
+rshell==0.0.32
 six==1.16.0
