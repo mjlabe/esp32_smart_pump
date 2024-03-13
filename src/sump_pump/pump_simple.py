@@ -60,7 +60,7 @@ class PumpSimple:
 
             # if pump is on for more than defined on time, shut off for defined cooldown time
             print("check cooldown")
-            if time_on > env.TIME_ON_MAX:
+            if time_on >= env.TIME_ON_MAX:
                 print("TIME_ON_MAX")
                 self.relay_pump.off()
                 self.led_pump.off()
