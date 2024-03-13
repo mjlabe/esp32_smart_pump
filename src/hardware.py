@@ -119,14 +119,12 @@ class Sensor:
         is_low = self.pin.value()
         sleep(1)
         is_low = is_low and self.pin.value()
-        print(type(is_low))
         return not is_low
 
     def high(self):
         is_high = not self.pin.value()
         sleep(1)
         is_high = is_high and not self.pin.value()
-        print(type(is_high))
         return is_high
 
     def value(self):

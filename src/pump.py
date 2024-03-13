@@ -30,6 +30,7 @@ def run():
 
         # main loop
         print("Monitoring...")
+        time_on = 0
         while True:
             # try:
             #     if gc.mem_free() < 102000:
@@ -51,7 +52,8 @@ def run():
             #     print("Connection closed")
 
             print("Checking levels")
-            pump.check_water_level()
+            print(f"Time On: {time_on}")
+            time_on = pump.check_water_level(time_on)
     except:
         print("ERROR: Shutting down...")
         pump.relay_pump.off()

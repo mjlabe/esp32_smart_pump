@@ -15,7 +15,7 @@ class PumpSimple:
         except Exception:
             self.device = "pump"
 
-    def check_water_level(self):
+    def check_water_level(self, time_on) -> int:
         try:
             print(f"sensor_water_high value: {self.sensor_water_high.value()}")
             # if the water is high, turn on pump for TIME_ON_MIN
@@ -32,11 +32,11 @@ class PumpSimple:
 
                 request_post(str(message))
 
-                print("SLEEP")
+                print(f"SLEEP {env.TIME_ON_MIN}")
 
                 sleep(env.TIME_ON_MIN)
 
-                print("i+=1")
+                time_on += env.TIME_ON_MIN
 
             # if the water is not high, turn off the TIME_OFF_MIN
             else:
@@ -52,30 +52,36 @@ class PumpSimple:
 
                 request_post(str(message))
 
+                print(f"SLEEP {env.TIME_OFF_MIN}")
+
                 sleep(env.TIME_OFF_MIN)
 
-                i = 0
+                time_on = 0
 
             # if pump is on for more than defined on time, shut off for defined cooldown time
             print("check cooldown")
-            if i * env.TIME_ON_MIN > env.TIME_ON_MAX:
+            if time_on > env.TIME_ON_MAX:
                 print("TIME_ON_MAX")
                 self.relay_pump.off()
                 self.led_pump.off()
 
-            message = {
-                "device": str(self.device),
-                "state": "off",
-                "cause": "TIME_ON_MAX"
-            }
-            request_post(str(message))
+                message = {
+                    "device": str(self.device),
+                    "state": "off",
+                    "cause": "TIME_ON_MAX"
+                }
+                request_post(str(message))
 
-            sleep(env.TIME_OFF_MIN)
-            i = 0
+                sleep(env.TIME_OFF_MIN)
+
+                time_on = 0
+
+            return time_on
 
         except Exception as error:
             # if there is an error, ignore it; we don't want flooding
             print(error)
 
         finally:
+            print(f"SLEEP {env.TIME_OFF_MIN}")
             sleep(env.TIME_OFF_MIN)
