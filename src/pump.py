@@ -14,41 +14,47 @@ esp.osdebug(None)
 
 
 def run():
-    print("Starting Server...")
+    print("Initializing...")
     pump = PumpSimple()
+    pump.relay_pump.off()
 
-    # start server
+    print("Starting Server...")
     try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind(("", 80))
-        sock.listen(5)
-    except Exception as e:
-        print(f"Error with wireless connection: {e}")
+        # start server
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.bind(("", 80))
+            sock.listen(5)
+        except Exception as e:
+            print(f"Error with wireless connection: {e}")
 
-    # main loop
-    print("Monitoring...")
-    while True:
-        # try:
-        #     if gc.mem_free() < 102000:
-        #         gc.collect()
-        #     conn, addr = sock.accept()
-        #     conn.settimeout(3.0)
-        #     print("Got a connection from %s" % str(addr))
-        #     request = conn.recv(1024)
-        #     conn.settimeout(None)
-        #
-        #     respond(conn, "")
-        # except OSError as e:
-        #     conn.close()
-        #     print("Connection closed")
-        # except Exception as e:
-        #     print(f"Error: {e}")
-        # finally:
-        #     conn.close()
-        #     print("Connection closed")
+        # main loop
+        print("Monitoring...")
+        while True:
+            # try:
+            #     if gc.mem_free() < 102000:
+            #         gc.collect()
+            #     conn, addr = sock.accept()
+            #     conn.settimeout(3.0)
+            #     print("Got a connection from %s" % str(addr))
+            #     request = conn.recv(1024)
+            #     conn.settimeout(None)
+            #
+            #     respond(conn, "")
+            # except OSError as e:
+            #     conn.close()
+            #     print("Connection closed")
+            # except Exception as e:
+            #     print(f"Error: {e}")
+            # finally:
+            #     conn.close()
+            #     print("Connection closed")
 
-        print("Checking levels")
-        pump.monitor_water()
+            print("Checking levels")
+            pump.check_water_level()
+    except:
+        print("ERROR: Shutting down...")
+        pump.relay_pump.off()
 
 
 def main():

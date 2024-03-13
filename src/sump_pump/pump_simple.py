@@ -15,70 +15,67 @@ class PumpSimple:
         except Exception:
             self.device = "pump"
 
-    def monitor_water(self):
-        i = 0
-        while True:
-            try:
-                # if the water is high, turn on pump for TIME_ON_MIN
-                if self.sensor_water_high.high():
-                    print("sensor_water_high.high")
-                    self.relay_pump.on()
-                    self.led_pump.on()
+    def check_water_level(self):
+        try:
+            print(f"sensor_water_high value: {self.sensor_water_high.value()}")
+            # if the water is high, turn on pump for TIME_ON_MIN
+            if self.sensor_water_high.high():
+                print("sensor_water_high.high")
+                self.relay_pump.on()
+                self.led_pump.on()
 
-                    message = {
-                        "device": str(self.device),
-                        "state": "on",
-                        "cause": "sensor_water_high.high"
-                    }
+                message = {
+                    "device": str(self.device),
+                    "state": "on",
+                    "cause": "sensor_water_high.high"
+                }
 
-                    request_post(str(message))
+                request_post(str(message))
 
-                    print("SLEEP")
+                print("SLEEP")
 
-                    sleep(env.TIME_ON_MIN)
+                sleep(env.TIME_ON_MIN)
 
-                    print("i+=1")
+                print("i+=1")
 
-                    i += 1
-
-                # if the water is not high, turn off the TIME_OFF_MIN
-                else:
-                    print("sensor_water_high.low")
-                    self.relay_pump.off()
-                    self.led_pump.off()
-
-                    message = {
-                        "device": str(self.device),
-                        "state": "off",
-                        "cause": "sensor_water_high.low"
-                    }
-
-                    request_post(str(message))
-
-                    sleep(env.TIME_OFF_MIN)
-
-                    i = 0
-
-                # if pump is on for more than defined on time, shut off for defined cooldown time
-                print("check cooldown")
-                if i * env.TIME_ON_MIN > env.TIME_ON_MAX:
-                    print("TIME_ON_MAX")
-                    self.relay_pump.off()
-                    self.led_pump.off()
+            # if the water is not high, turn off the TIME_OFF_MIN
+            else:
+                print("sensor_water_high.low")
+                self.relay_pump.off()
+                self.led_pump.off()
 
                 message = {
                     "device": str(self.device),
                     "state": "off",
-                    "cause": "TIME_ON_MAX"
+                    "cause": "sensor_water_high.low"
                 }
+
                 request_post(str(message))
 
                 sleep(env.TIME_OFF_MIN)
+
                 i = 0
 
-                sleep(env.TIME_OFF_MIN)   # wait 10s before next measure
+            # if pump is on for more than defined on time, shut off for defined cooldown time
+            print("check cooldown")
+            if i * env.TIME_ON_MIN > env.TIME_ON_MAX:
+                print("TIME_ON_MAX")
+                self.relay_pump.off()
+                self.led_pump.off()
 
-            except Exception as error:
-                # if there is an error, ignore it; we don't want flooding
-                print(error)
-                sleep(env.TIME_OFF_MIN)
+            message = {
+                "device": str(self.device),
+                "state": "off",
+                "cause": "TIME_ON_MAX"
+            }
+            request_post(str(message))
+
+            sleep(env.TIME_OFF_MIN)
+            i = 0
+
+        except Exception as error:
+            # if there is an error, ignore it; we don't want flooding
+            print(error)
+
+        finally:
+            sleep(env.TIME_OFF_MIN)
