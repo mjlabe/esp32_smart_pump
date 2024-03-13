@@ -7,7 +7,7 @@ except:
     import socket
 
 from hardware import connect
-from api import respond
+from api import respond, get_requests
 from sump_pump.pump_simple import PumpSimple
 
 esp.osdebug(None)
@@ -32,25 +32,7 @@ def run():
         print("Monitoring...")
         time_on = 0
         while True:
-            # try:
-            #     if gc.mem_free() < 102000:
-            #         gc.collect()
-            #     conn, addr = sock.accept()
-            #     conn.settimeout(3.0)
-            #     print("Got a connection from %s" % str(addr))
-            #     request = conn.recv(1024)
-            #     conn.settimeout(None)
-            #
-            #     respond(conn, "")
-            # except OSError as e:
-            #     conn.close()
-            #     print("Connection closed")
-            # except Exception as e:
-            #     print(f"Error: {e}")
-            # finally:
-            #     conn.close()
-            #     print("Connection closed")
-
+            # get_requests(sock)
             print("Checking levels")
             print(f"Time On: {time_on}")
             time_on = pump.check_water_level(time_on)

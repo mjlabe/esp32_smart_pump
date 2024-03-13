@@ -74,3 +74,24 @@ def respond(conn, message):
     conn.send("Content-Type: text/html\n")
     conn.send("Connection: close\n\n")
     conn.sendall(message)
+
+
+def get_requests(sock):
+    try:
+        if gc.mem_free() < 102000:
+            gc.collect()
+        conn, addr = sock.accept()
+        conn.settimeout(3.0)
+        print("Got a connection from %s" % str(addr))
+        request = conn.recv(1024)
+        conn.settimeout(None)
+
+        respond(conn, "")
+    except OSError as e:
+        conn.close()
+        print("Connection closed")
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        conn.close()
+        print("Connection closed")

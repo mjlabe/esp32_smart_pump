@@ -1,5 +1,7 @@
 from time import sleep
 
+import urequests as requests
+
 from hardware import LED, Relay, Sensor, request_post
 
 import env as env
@@ -30,7 +32,13 @@ class PumpSimple:
                     "cause": "sensor_water_high.high"
                 }
 
-                request_post(str(message))
+                # request_post(str(message))
+                response = requests.post(
+                    url=env.LOG_URL,
+                    json=message
+                )
+
+                print(response.text)
 
                 print(f"SLEEP {env.TIME_ON_MIN}")
 
@@ -50,7 +58,13 @@ class PumpSimple:
                     "cause": "sensor_water_high.low"
                 }
 
-                request_post(str(message))
+                # request_post(str(message))
+                response = requests.post(
+                    url=env.LOG_URL,
+                    json=message
+                )
+
+                print(response.text)
 
                 print(f"SLEEP {env.TIME_OFF_MIN}")
 
@@ -70,7 +84,13 @@ class PumpSimple:
                     "state": "off",
                     "cause": "TIME_ON_MAX"
                 }
-                request_post(str(message))
+                # request_post(str(message))
+                response = requests.post(
+                    url=env.LOG_URL,
+                    json=message
+                )
+
+                print(response.text)
 
                 sleep(env.TIME_OFF_MIN)
 

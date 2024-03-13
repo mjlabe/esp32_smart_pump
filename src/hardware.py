@@ -1,5 +1,4 @@
 from time import sleep
-
 try:
     import usocket as socket
 except:
