@@ -1,4 +1,6 @@
 from time import sleep
+import urequests as requests
+
 try:
     import usocket as socket
 except:
@@ -44,35 +46,13 @@ def connect(ssid=env.WIFI_SSID, password=env.WIFI_PASSWD):
 
 def request_post(message):
     print(f"POST {message}")
-    conn = None
     try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        if gc.mem_free() < 102000:
-            gc.collect()
-        conn, addr = sock.accept()
-        conn.settimeout(3.0)
-        print("Got a connection from %s" % str(addr))
-        request = conn.recv(1024)
-        conn.settimeout(None)
-
-        conn.send("HTTP/1.1 200 OK\n")
-        conn.send("Content-Type: text/html\n")
-        conn.send("Connection: close\n\n")
-        conn.sendall(message)
-    except OSError as e:
-        try:
-            conn.close()
-            print("Connection closed")
-        except Exception as e:
-            pass
-    except Exception as e:
-        pass
-    finally:
-        try:
-            conn.close()
-            print("Connection closed")
-        except Exception as e:
-            pass
+        requests.post(
+            url=env.LOG_URL,
+            json=message
+        )
+    except Exception as error:
+        print(error)
 
 
 class LED:

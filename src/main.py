@@ -7,7 +7,6 @@ except:
     import socket
 
 from hardware import connect
-from api import respond, get_requests
 from sump_pump.pump_simple import PumpSimple
 
 esp.osdebug(None)
@@ -33,8 +32,6 @@ def run():
         time_on = 0
         while True:
             # get_requests(sock)
-            print("Checking levels")
-            print(f"Time On: {time_on}")
             time_on = pump.check_water_level(time_on)
     except:
         print("ERROR: Shutting down...")

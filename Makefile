@@ -13,7 +13,7 @@ terminal:
 
 .PHONY: erase
 erase:
-	esptool.py --port /dev/tty.$(DEVICE) erase_flash
+	esptool.py --port /dev/tty.$(DEVICE) -b 115200 erase_flash
 
 .PHONY: flash
 flash:
