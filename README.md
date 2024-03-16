@@ -14,7 +14,7 @@ Assemble device as shown in TBD (or however you want and set the pins below).
 ### Configuration
 
 1. Create a file under `src` named `env.py`
-2. Add the following variables and values ou desire:
+2. Add the following variables and values you desire:
    1. TIME_ON_MIN = 30 (minimum time you want the pump to run^)
    2. TIME_OFF_MIN = 10 (minimum time you want the pump to turn off^)
    3. WIFI_SSID = "your wifi ssid" *
